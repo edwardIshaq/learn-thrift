@@ -10,37 +10,51 @@ import Foundation
 import Thrift
 
 
-public func ==(lhs: user, rhs: user) -> Bool {
-  return true
+public func ==(lhs: User, rhs: User) -> Bool {
+  return
+    (lhs.userId == rhs.userId) &&
+    (lhs.username == rhs.username) &&
+    (lhs.age == rhs.age)
 }
 
-extension user : CustomStringConvertible {
+extension User : CustomStringConvertible {
 
   public var description : String {
-    var desc = "user("
+    var desc = "User("
+    desc += "userId=\(String(describing: self.userId)), "
+    desc += "username=\(String(describing: self.username)), "
+    desc += "age=\(String(describing: self.age))"
     return desc
   }
 
 }
 
-extension user : Hashable {
+extension User : Hashable {
 
   public var hashValue : Int {
-    return 31
+    let prime = 31
+    var result = 1
+    result = prime &* result &+ (userId.hashValue)
+    result = prime &* result &+ (username.hashValue)
+    result = prime &* result &+ (age.hashValue)
+    return result
   }
 
 }
 
-extension user : TStruct {
+extension User : TStruct {
 
   public static var fieldIds: [String: Int32] {
-    return [:]
+    return ["userId": 1, "username": 2, "age": 3, ]
   }
 
-  public static var structName: String { return "user" }
+  public static var structName: String { return "User" }
 
-  public static func read(from proto: TProtocol) throws -> user {
+  public static func read(from proto: TProtocol) throws -> User {
     _ = try proto.readStructBegin()
+    var userId: int!
+    var username: String!
+    var age: int!
 
     fields: while true {
 
@@ -48,6 +62,220 @@ extension user : TStruct {
 
       switch (fieldID, fieldType) {
         case (_, .stop):            break fields
+        case (1, .i32):             userId = try int.read(from: proto)
+        case (2, .string):           username = try String.read(from: proto)
+        case (3, .i32):             age = try int.read(from: proto)
+        case let (_, unknownType):  try proto.skip(type: unknownType)
+      }
+
+      try proto.readFieldEnd()
+    }
+
+    try proto.readStructEnd()
+    // Required fields
+    try proto.validateValue(userId, named: "userId")
+    try proto.validateValue(username, named: "username")
+    try proto.validateValue(age, named: "age")
+
+    return User(userId: userId, username: username, age: age)
+  }
+
+}
+
+
+
+public func ==(lhs: Channel, rhs: Channel) -> Bool {
+  return
+    (lhs.channelId == rhs.channelId) &&
+    (lhs.name == rhs.name) &&
+    (lhs.UserId == rhs.UserId)
+}
+
+extension Channel : CustomStringConvertible {
+
+  public var description : String {
+    var desc = "Channel("
+    desc += "channelId=\(String(describing: self.channelId)), "
+    desc += "name=\(String(describing: self.name)), "
+    desc += "UserId=\(String(describing: self.UserId))"
+    return desc
+  }
+
+}
+
+extension Channel : Hashable {
+
+  public var hashValue : Int {
+    let prime = 31
+    var result = 1
+    result = prime &* result &+ (channelId.hashValue)
+    result = prime &* result &+ (name.hashValue)
+    result = prime &* result &+ (UserId.hashValue)
+    return result
+  }
+
+}
+
+extension Channel : TStruct {
+
+  public static var fieldIds: [String: Int32] {
+    return ["channelId": 1, "name": 2, "UserId": 3, ]
+  }
+
+  public static var structName: String { return "Channel" }
+
+  public static func read(from proto: TProtocol) throws -> Channel {
+    _ = try proto.readStructBegin()
+    var channelId: int!
+    var name: String!
+    var UserId: TList<int>!
+
+    fields: while true {
+
+      let (_, fieldType, fieldID) = try proto.readFieldBegin()
+
+      switch (fieldID, fieldType) {
+        case (_, .stop):            break fields
+        case (1, .i32):             channelId = try int.read(from: proto)
+        case (2, .string):           name = try String.read(from: proto)
+        case (3, .list):            UserId = try TList<int>.read(from: proto)
+        case let (_, unknownType):  try proto.skip(type: unknownType)
+      }
+
+      try proto.readFieldEnd()
+    }
+
+    try proto.readStructEnd()
+    // Required fields
+    try proto.validateValue(channelId, named: "channelId")
+    try proto.validateValue(name, named: "name")
+    try proto.validateValue(UserId, named: "UserId")
+
+    return Channel(channelId: channelId, name: name, UserId: UserId)
+  }
+
+}
+
+
+
+fileprivate final class UsersProviderService_createUser_args {
+
+  fileprivate var username: String
+
+  fileprivate var age: int
+
+
+  fileprivate init(username: String, age: int) {
+    self.username = username
+    self.age = age
+  }
+
+}
+
+fileprivate func ==(lhs: UsersProviderService_createUser_args, rhs: UsersProviderService_createUser_args) -> Bool {
+  return
+    (lhs.username == rhs.username) &&
+    (lhs.age == rhs.age)
+}
+
+extension UsersProviderService_createUser_args : Hashable {
+
+  fileprivate var hashValue : Int {
+    let prime = 31
+    var result = 1
+    result = prime &* result &+ (username.hashValue)
+    result = prime &* result &+ (age.hashValue)
+    return result
+  }
+
+}
+
+extension UsersProviderService_createUser_args : TStruct {
+
+  fileprivate static var fieldIds: [String: Int32] {
+    return ["username": 1, "age": 2, ]
+  }
+
+  fileprivate static var structName: String { return "UsersProviderService_createUser_args" }
+
+  fileprivate static func read(from proto: TProtocol) throws -> UsersProviderService_createUser_args {
+    _ = try proto.readStructBegin()
+    var username: String!
+    var age: int!
+
+    fields: while true {
+
+      let (_, fieldType, fieldID) = try proto.readFieldBegin()
+
+      switch (fieldID, fieldType) {
+        case (_, .stop):            break fields
+        case (1, .string):           username = try String.read(from: proto)
+        case (2, .i32):             age = try int.read(from: proto)
+        case let (_, unknownType):  try proto.skip(type: unknownType)
+      }
+
+      try proto.readFieldEnd()
+    }
+
+    try proto.readStructEnd()
+    // Required fields
+    try proto.validateValue(username, named: "username")
+    try proto.validateValue(age, named: "age")
+
+    return UsersProviderService_createUser_args(username: username, age: age)
+  }
+
+}
+
+
+
+fileprivate final class UsersProviderService_createUser_result {
+
+  fileprivate var success: User?
+
+
+  fileprivate init() { }
+  fileprivate init(success: User?) {
+    self.success = success
+  }
+
+}
+
+fileprivate func ==(lhs: UsersProviderService_createUser_result, rhs: UsersProviderService_createUser_result) -> Bool {
+  return
+    (lhs.success == rhs.success)
+}
+
+extension UsersProviderService_createUser_result : Hashable {
+
+  fileprivate var hashValue : Int {
+    let prime = 31
+    var result = 1
+    result = prime &* result &+ (success?.hashValue ?? 0)
+    return result
+  }
+
+}
+
+extension UsersProviderService_createUser_result : TStruct {
+
+  fileprivate static var fieldIds: [String: Int32] {
+    return ["success": 0, ]
+  }
+
+  fileprivate static var structName: String { return "UsersProviderService_createUser_result" }
+
+  fileprivate static func read(from proto: TProtocol) throws -> UsersProviderService_createUser_result {
+    _ = try proto.readStructBegin()
+    var success: User?
+
+    fields: while true {
+
+      let (_, fieldType, fieldID) = try proto.readFieldBegin()
+
+      switch (fieldID, fieldType) {
+        case (_, .stop):            break fields
+        case (0, .struct):           success = try User.read(from: proto)
         case let (_, unknownType):  try proto.skip(type: unknownType)
       }
 
@@ -56,12 +284,251 @@ extension user : TStruct {
 
     try proto.readStructEnd()
 
-    return user()
+    return UsersProviderService_createUser_result(success: success)
   }
 
 }
 
 
+
+fileprivate final class UsersProviderService_userById_args {
+
+  fileprivate var userId: int
+
+
+  fileprivate init(userId: int) {
+    self.userId = userId
+  }
+
+}
+
+fileprivate func ==(lhs: UsersProviderService_userById_args, rhs: UsersProviderService_userById_args) -> Bool {
+  return
+    (lhs.userId == rhs.userId)
+}
+
+extension UsersProviderService_userById_args : Hashable {
+
+  fileprivate var hashValue : Int {
+    let prime = 31
+    var result = 1
+    result = prime &* result &+ (userId.hashValue)
+    return result
+  }
+
+}
+
+extension UsersProviderService_userById_args : TStruct {
+
+  fileprivate static var fieldIds: [String: Int32] {
+    return ["userId": 1, ]
+  }
+
+  fileprivate static var structName: String { return "UsersProviderService_userById_args" }
+
+  fileprivate static func read(from proto: TProtocol) throws -> UsersProviderService_userById_args {
+    _ = try proto.readStructBegin()
+    var userId: int!
+
+    fields: while true {
+
+      let (_, fieldType, fieldID) = try proto.readFieldBegin()
+
+      switch (fieldID, fieldType) {
+        case (_, .stop):            break fields
+        case (1, .i32):             userId = try int.read(from: proto)
+        case let (_, unknownType):  try proto.skip(type: unknownType)
+      }
+
+      try proto.readFieldEnd()
+    }
+
+    try proto.readStructEnd()
+    // Required fields
+    try proto.validateValue(userId, named: "userId")
+
+    return UsersProviderService_userById_args(userId: userId)
+  }
+
+}
+
+
+
+fileprivate final class UsersProviderService_userById_result {
+
+  fileprivate var success: User?
+
+
+  fileprivate init() { }
+  fileprivate init(success: User?) {
+    self.success = success
+  }
+
+}
+
+fileprivate func ==(lhs: UsersProviderService_userById_result, rhs: UsersProviderService_userById_result) -> Bool {
+  return
+    (lhs.success == rhs.success)
+}
+
+extension UsersProviderService_userById_result : Hashable {
+
+  fileprivate var hashValue : Int {
+    let prime = 31
+    var result = 1
+    result = prime &* result &+ (success?.hashValue ?? 0)
+    return result
+  }
+
+}
+
+extension UsersProviderService_userById_result : TStruct {
+
+  fileprivate static var fieldIds: [String: Int32] {
+    return ["success": 0, ]
+  }
+
+  fileprivate static var structName: String { return "UsersProviderService_userById_result" }
+
+  fileprivate static func read(from proto: TProtocol) throws -> UsersProviderService_userById_result {
+    _ = try proto.readStructBegin()
+    var success: User?
+
+    fields: while true {
+
+      let (_, fieldType, fieldID) = try proto.readFieldBegin()
+
+      switch (fieldID, fieldType) {
+        case (_, .stop):            break fields
+        case (0, .struct):           success = try User.read(from: proto)
+        case let (_, unknownType):  try proto.skip(type: unknownType)
+      }
+
+      try proto.readFieldEnd()
+    }
+
+    try proto.readStructEnd()
+
+    return UsersProviderService_userById_result(success: success)
+  }
+
+}
+
+
+
+extension UsersProviderServiceClient : UsersProviderService {
+
+  private func send_createUser(username: String, age: int) throws {
+    try outProtocol.writeMessageBegin(name: "createUser", type: .call, sequenceID: 0)
+    let args = UsersProviderService_createUser_args(username: username, age: age)
+    try args.write(to: outProtocol)
+    try outProtocol.writeMessageEnd()
+  }
+
+  private func recv_createUser() throws -> User {
+    try inProtocol.readResultMessageBegin() 
+    let result = try UsersProviderService_createUser_result.read(from: inProtocol)
+    try inProtocol.readMessageEnd()
+
+    if let success = result.success {
+      return success
+    }
+    throw TApplicationError(error: .missingResult(methodName: "createUser"))
+  }
+
+  public func createUser(username: String, age: int) throws -> User {
+    try send_createUser(username: username, age: age)
+    try outProtocol.transport.flush()
+    return try recv_createUser()
+  }
+
+  private func send_userById(userId: int) throws {
+    try outProtocol.writeMessageBegin(name: "userById", type: .call, sequenceID: 0)
+    let args = UsersProviderService_userById_args(userId: userId)
+    try args.write(to: outProtocol)
+    try outProtocol.writeMessageEnd()
+  }
+
+  private func recv_userById() throws -> User {
+    try inProtocol.readResultMessageBegin() 
+    let result = try UsersProviderService_userById_result.read(from: inProtocol)
+    try inProtocol.readMessageEnd()
+
+    if let success = result.success {
+      return success
+    }
+    throw TApplicationError(error: .missingResult(methodName: "userById"))
+  }
+
+  public func userById(userId: int) throws -> User {
+    try send_userById(userId: userId)
+    try outProtocol.transport.flush()
+    return try recv_userById()
+  }
+
+}
+
+extension UsersProviderServiceProcessor : TProcessor {
+
+  static let processorHandlers: ProcessorHandlerDictionary = {
+
+    var processorHandlers = ProcessorHandlerDictionary()
+
+    processorHandlers["createUser"] = { sequenceID, inProtocol, outProtocol, handler in
+
+      let args = try UsersProviderService_createUser_args.read(from: inProtocol)
+
+      try inProtocol.readMessageEnd()
+
+      var result = UsersProviderService_createUser_result()
+      do {
+        result.success = try handler.createUser(username: args.username, age: args.age)
+      }
+      catch let error { throw error }
+
+      try outProtocol.writeMessageBegin(name: "createUser", type: .reply, sequenceID: sequenceID)
+      try result.write(to: outProtocol)
+      try outProtocol.writeMessageEnd()
+    }
+    processorHandlers["userById"] = { sequenceID, inProtocol, outProtocol, handler in
+
+      let args = try UsersProviderService_userById_args.read(from: inProtocol)
+
+      try inProtocol.readMessageEnd()
+
+      var result = UsersProviderService_userById_result()
+      do {
+        result.success = try handler.userById(userId: args.userId)
+      }
+      catch let error { throw error }
+
+      try outProtocol.writeMessageBegin(name: "userById", type: .reply, sequenceID: sequenceID)
+      try result.write(to: outProtocol)
+      try outProtocol.writeMessageEnd()
+    }
+    return processorHandlers
+  }()
+
+  public func process(on inProtocol: TProtocol, outProtocol: TProtocol) throws {
+
+    let (messageName, _, sequenceID) = try inProtocol.readMessageBegin()
+
+    if let processorHandler = UsersProviderServiceProcessor.processorHandlers[messageName] {
+      do {
+        try processorHandler(sequenceID, inProtocol, outProtocol, service)
+      }
+      catch let error as TApplicationError {
+        try outProtocol.writeException(messageName: messageName, sequenceID: sequenceID, ex: error)
+      }
+    }
+    else {
+      try inProtocol.skip(type: .struct)
+      try inProtocol.readMessageEnd()
+      let ex = TApplicationError(error: .unknownMethod(methodName: messageName))
+      try outProtocol.writeException(messageName: messageName, sequenceID: sequenceID, ex: ex)
+    }
+  }
+}
 
 fileprivate final class MultiplicationService_multiply_args {
 

@@ -12,10 +12,73 @@ import Thrift
 
 public typealias int = Int32
 
-public final class user {
+public final class User {
+
+  public var userId: int
+
+  public var username: String
+
+  public var age: int
 
 
-  public init() { }
+  public init(userId: int, username: String, age: int) {
+    self.userId = userId
+    self.username = username
+    self.age = age
+  }
+
+}
+
+public final class Channel {
+
+  public var channelId: int
+
+  public var name: String
+
+  public var UserId: TList<int>
+
+
+  public init(channelId: int, name: String, UserId: TList<int>) {
+    self.channelId = channelId
+    self.name = name
+    self.UserId = UserId
+  }
+
+}
+
+public protocol UsersProviderService {
+
+  ///
+  /// - Parameters:
+  ///   - username: 
+  ///   - age: 
+  /// - Returns: User
+  /// - Throws: 
+  func createUser(username: String, age: int) throws -> User
+
+  ///
+  /// - Parameters:
+  ///   - userId: 
+  /// - Returns: User
+  /// - Throws: 
+  func userById(userId: int) throws -> User
+
+}
+
+open class UsersProviderServiceClient : TClient /* , UsersProviderService */ {
+
+}
+
+open class UsersProviderServiceProcessor /* UsersProviderService */ {
+
+  typealias ProcessorHandlerDictionary = [String: (Int32, TProtocol, TProtocol, UsersProviderService) throws -> Void]
+
+  public var service: UsersProviderService
+
+  public required init(service: UsersProviderService) {
+    self.service = service
+  }
+
 }
 
 public protocol MultiplicationService {
