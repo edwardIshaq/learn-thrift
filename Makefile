@@ -4,7 +4,7 @@ lang=swift
 OUTPUT_DIR:=./gen-src
 GEN_OUTPUT:=${OUTPUT_DIR}/${lang}
 
-gen:
+thrift:
 	mkdir -p ${GEN_OUTPUT}
 	./thrift.sh -out ${GEN_OUTPUT} --gen ${lang} ${THRIFT_FILE}
 
